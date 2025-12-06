@@ -1,5 +1,5 @@
 python -m internbootcamp.utils.batch_data_generation \
-    --bootcamp-registry internbootcamp/bootcamps/NP_MM/bootcamp_registry/bootcamp_registry_NP_MM.jsonl \
+    --bootcamp-registry internbootcamp/bootcamps/NP_MM/configs/bootcamp_registry_NP_MM.jsonl \
     --output-dir data/NP_MM_test/ \
     --split-samples train:500,test:50 \
     --max-workers 64 \

@@ -1,5 +1,5 @@
 import ast
-from verl.Bootcampv2.base_reward_calculator import BaseRewardCalculator
+from internbootcamp.src.base_reward_calculator import BaseRewardCalculator
 
 class NpTspRewardCalculator(BaseRewardCalculator):
     @classmethod

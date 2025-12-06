@@ -1,0 +1,27 @@
+Basic Evaluation Information
+Item,Value
+Evaluation Model,DeepSeek-V3
+Dataset Path,data/rectangle_count/easy_rectangle_count_20251205150653_train.jsonl
+Tool Configuration,Default
+Output Path,outputs/DeepSeek-V3/eval_results_20251206110846.jsonl
+Max Assistant Turns,
+Max User Turns,
+api_extra_params,{}
+api_extra_headers,{}
+
+Overall Statistics
+Metric,Value
+Total Samples,100
+Successful Samples,100
+Failed Samples,0
+Success Rate,100.00%
+Overall Average Score,0.3520
+
+Data Source Summary Statistics
+Data Source,Total Samples,,Success Count,Failed Count,Success Rate,Average Score,Max Score,Min Score,Avg Assistant Turns,Avg Tool Calls,Avg Interaction Turns,Avg Initial Prompt Tokens,Avg Completion Tokens,Avg Global Sequence Tokens,Avg Cumulative Prompt Tokens,Avg Total Tokens
+bootcamp/RectangleCount,100,,100,0,100.00%,0.3520,1.0000,0.1000,1.00,0.00,1.00,626.75,654.98,1281.73,626.75,1281.73
+
+Generator Detailed Statistics
+Data Source,Generator Name,Sample Count,Success Count,Failed Count,Success Rate,Average Score,Max Score,Min Score,Avg Assistant Turns,Avg Tool Calls,Avg Interaction Turns,Avg Initial Prompt Tokens,Avg Completion Tokens,Avg Cumulative Prompt Tokens,Avg Global Sequence Tokens,Avg Total Tokens
+bootcamp/RectangleCount,l10,100,100,0,100.00%,0.3520,1.0000,0.1000,1.00,0.00,1.00,626.75,654.98,1281.73,626.75,1281.73
+

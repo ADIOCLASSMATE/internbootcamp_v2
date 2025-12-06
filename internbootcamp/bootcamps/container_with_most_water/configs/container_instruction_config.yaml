@@ -1,0 +1,49 @@
+instruction_generators:
+  level_1:
+    config:
+      difficulty: "level_1"
+      data_range: [1, 20]
+      list_length_range: [5, 10]
+      seed: 42
+      generation_ratio: 0.2
+      data_folder: "data/container_with_most_water"
+  level_2:
+    config:
+      difficulty: "level_2"
+      data_range: [1, 40]
+      list_length_range: [10, 20]
+      seed: 42
+      generation_ratio: 0.2
+      data_folder: "data/container_with_most_water"
+  level_3:
+    config:
+      difficulty: "level_3"
+      data_range: [1, 60]
+      list_length_range: [20, 30]
+      seed: 42
+      generation_ratio: 0.2
+      data_folder: "data/container_with_most_water"
+  level_4:
+    config:
+      difficulty: "level_4"
+      data_range: [1, 80]
+      list_length_range: [30, 40]
+      seed: 42
+      generation_ratio: 0.2
+      data_folder: "data/container_with_most_water"
+  level_5:
+    config:
+      difficulty: "level_5"
+      data_range: [1, 100]
+      list_length_range: [40, 70]
+      seed: 42
+      generation_ratio: 0.2
+      data_folder: "data/container_with_most_water"
+
+global_config:
+  class_name: "internbootcamp.bootcamps.container_with_most_water.instruction_generator.ContainerWithMostWaterInstructionGenerator"
+  default_split_samples:
+    train: 500
+    test: 10
+  shuffle: true
+  gen_parquet: true

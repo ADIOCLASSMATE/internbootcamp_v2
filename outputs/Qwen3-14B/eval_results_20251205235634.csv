@@ -1,0 +1,27 @@
+Basic Evaluation Information
+Item,Value
+Evaluation Model,Qwen3-14B
+Dataset Path,data/rectangle_count/easy_rectangle_count_20251205150653_train.jsonl
+Tool Configuration,Default
+Output Path,outputs/Qwen3-14B/eval_results_20251205235634.jsonl
+Max Assistant Turns,
+Max User Turns,
+api_extra_params,{}
+api_extra_headers,{}
+
+Overall Statistics
+Metric,Value
+Total Samples,100
+Successful Samples,100
+Failed Samples,0
+Success Rate,100.00%
+Overall Average Score,0.2510
+
+Data Source Summary Statistics
+Data Source,Total Samples,,Success Count,Failed Count,Success Rate,Average Score,Max Score,Min Score,Avg Assistant Turns,Avg Tool Calls,Avg Interaction Turns,Avg Initial Prompt Tokens,Avg Completion Tokens,Avg Global Sequence Tokens,Avg Cumulative Prompt Tokens,Avg Total Tokens
+bootcamp/RectangleCount,100,,100,0,100.00%,0.2510,1.0000,0.0000,1.00,0.00,1.00,595.75,11174.82,11770.57,595.75,11770.57
+
+Generator Detailed Statistics
+Data Source,Generator Name,Sample Count,Success Count,Failed Count,Success Rate,Average Score,Max Score,Min Score,Avg Assistant Turns,Avg Tool Calls,Avg Interaction Turns,Avg Initial Prompt Tokens,Avg Completion Tokens,Avg Cumulative Prompt Tokens,Avg Global Sequence Tokens,Avg Total Tokens
+bootcamp/RectangleCount,l10,100,100,0,100.00%,0.2510,1.0000,0.0000,1.00,0.00,1.00,595.75,11174.82,11770.57,595.75,11770.57
+

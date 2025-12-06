@@ -1,0 +1,17 @@
+instruction_generators:
+  l10:
+    config:
+      difficulty: "level_10"
+      max_rectangles: 10
+      width: 20
+      height: 20
+      seed: 42
+      generation_ratio: 1.0
+
+global_config:
+  class_name: "internbootcamp.bootcamps.rectangle_count.instruction_generator.RectangleCountInstructionGenerator"
+  default_split_samples:
+    train: 100
+    test: 10
+  shuffle: true
+  gen_parquet: true

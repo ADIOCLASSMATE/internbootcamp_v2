@@ -1,0 +1,31 @@
+Basic Evaluation Information
+Item,Value
+Evaluation Model,Qwen2.5-VL-72B-Instruct
+Dataset Path,data/container_with_most_water/container_20251205153737_train.jsonl
+Tool Configuration,Default
+Output Path,outputs/Qwen2.5-VL-72B-Instruct/eval_results_20251206145119.jsonl
+Max Assistant Turns,
+Max User Turns,
+api_extra_params,{}
+api_extra_headers,{}
+
+Overall Statistics
+Metric,Value
+Total Samples,100
+Successful Samples,100
+Failed Samples,0
+Success Rate,100.00%
+Overall Average Score,0.3610
+
+Data Source Summary Statistics
+Data Source,Total Samples,,Success Count,Failed Count,Success Rate,Average Score,Max Score,Min Score,Avg Assistant Turns,Avg Tool Calls,Avg Interaction Turns,Avg Initial Prompt Tokens,Avg Completion Tokens,Avg Global Sequence Tokens,Avg Cumulative Prompt Tokens,Avg Total Tokens
+bootcamp/ContainerWithMostWater,100,,100,0,100.00%,0.3610,1.0000,0.1000,1.00,0.00,1.00,1710.00,775.05,2485.05,1710.00,2485.05
+
+Generator Detailed Statistics
+Data Source,Generator Name,Sample Count,Success Count,Failed Count,Success Rate,Average Score,Max Score,Min Score,Avg Assistant Turns,Avg Tool Calls,Avg Interaction Turns,Avg Initial Prompt Tokens,Avg Completion Tokens,Avg Cumulative Prompt Tokens,Avg Global Sequence Tokens,Avg Total Tokens
+bootcamp/ContainerWithMostWater,level_1,20,20,0,100.00%,0.8650,1.0000,0.1000,1.00,0.00,1.00,1710.00,958.40,2668.40,1710.00,2668.40
+bootcamp/ContainerWithMostWater,level_2,20,20,0,100.00%,0.5050,1.0000,0.1000,1.00,0.00,1.00,1710.00,868.50,2578.50,1710.00,2578.50
+bootcamp/ContainerWithMostWater,level_3,20,20,0,100.00%,0.1900,1.0000,0.1000,1.00,0.00,1.00,1710.00,852.60,2562.60,1710.00,2562.60
+bootcamp/ContainerWithMostWater,level_4,20,20,0,100.00%,0.1450,1.0000,0.1000,1.00,0.00,1.00,1710.00,595.45,2305.45,1710.00,2305.45
+bootcamp/ContainerWithMostWater,level_5,20,20,0,100.00%,0.1000,0.1000,0.1000,1.00,0.00,1.00,1710.00,600.30,2310.30,1710.00,2310.30
+

@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-from verl.Bootcampv2.base_reward_calculator import BaseRewardCalculator
+from internbootcamp.src.base_reward_calculator import BaseRewardCalculator
 import re
 
 class NpGcpDRewardCalculator(BaseRewardCalculator):

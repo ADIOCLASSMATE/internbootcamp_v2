@@ -1,5 +1,5 @@
 # 使用bootcamp注册表进行批量评测
-python -m verl.Bootcampv2.utils.run_evaluation \
+python -m internbootcamp.utils.run_evaluation \
   --dataset-path internbootcamp/bootcamps/NP_MM/data/TSP_20251118152919_train.jsonl \
   --bootcamp-registry internbootcamp/bootcamps/NP_MM/configs/bootcamp_registry_NP_MM.jsonl \
   --output-dir results/batch_evaluation/ \

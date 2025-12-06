@@ -1,0 +1,17 @@
+.venv
+vllm_*
+data
+.sii
+public
+__pycache__
+*.pyc
+
+*.log
+*.pid
+*.png
+*.jpg
+.DS_Store
+.idea/
+.vscode/
+.ipynb_checkpoints
+.env
