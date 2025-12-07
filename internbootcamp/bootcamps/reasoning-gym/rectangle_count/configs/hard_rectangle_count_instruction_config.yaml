@@ -9,9 +9,6 @@ instruction_generators:
       generation_ratio: 1.0 
 
 global_config:
-  class_name: "internbootcamp.bootcamps.rectangle_count.instruction_generator.RectangleCountInstructionGenerator"
-  default_split_samples:
-    train: 100
-    test: 10
+  class_name: "internbootcamp.bootcamps.reasoning-gym.rectangle_count.instruction_generator.RectangleCountInstructionGenerator"
   shuffle: true
   gen_parquet: true

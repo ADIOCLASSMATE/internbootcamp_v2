@@ -41,9 +41,6 @@ instruction_generators:
       data_folder: "data/container_with_most_water"
 
 global_config:
-  class_name: "internbootcamp.bootcamps.container_with_most_water.instruction_generator.ContainerWithMostWaterInstructionGenerator"
-  default_split_samples:
-    train: 500
-    test: 10
+  class_name: "internbootcamp.bootcamps.MM-HELIX.container_with_most_water.instruction_generator.ContainerWithMostWaterInstructionGenerator"
   shuffle: true
   gen_parquet: true

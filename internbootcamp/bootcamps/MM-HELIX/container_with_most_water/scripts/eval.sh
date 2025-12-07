@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# 容器盛水问题评测脚本
-# 使用从主脚本 export 的环境变量
+# container_with_most_water问题评测脚本
 API_URL=${API_URL:-"http://localhost:8000/v1"}
 MODEL_NAME=${MODEL_NAME:-"unknown"}
 API_KEY=${API_KEY:-"null"}
@@ -21,7 +20,7 @@ if [ -n "$DATASET" ]; then
       --api-key "${API_KEY}" \
       --api-url "${API_URL}" \
       --api-model ${MODEL_NAME} \
-      --reward-calculator-class "internbootcamp.bootcamps.container_with_most_water.reward_calculator.ContainerWithMostWaterRewardCalculator" \
+      --reward-calculator-class "internbootcamp.bootcamps.MM-HELIX.container_with_most_water.reward_calculator.ContainerWithMostWaterRewardCalculator" \
       --max-concurrent 32 \
       --verbose
     

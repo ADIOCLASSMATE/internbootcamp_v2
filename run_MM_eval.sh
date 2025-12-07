@@ -1,7 +1,7 @@
 cd /inspire/hdd/project/high-dimensionaldata/wanjiaxin-253108030048/internbootcamp_v2
 source .venv/bin/activate
 
-# bash internbootcamp/bootcamps/rectangle_count/scripts/rectangle_count_generator.sh
+bash internbootcamp/bootcamps/MM-HELIX/container_with_most_water/scripts/container_generator.sh
 
 BASE_URL=public
 MODEL_LIST=(
@@ -25,7 +25,7 @@ for MODEL in "${MODEL_LIST[@]}"; do
 
     bash deploy_vllm.sh
 
-    bash internbootcamp/bootcamps/container_with_most_water/scripts/eval.sh
+    bash internbootcamp/bootcamps/MM-HELIX/container_with_most_water/scripts/eval.sh
 
     bash stop_vllm.sh
 done

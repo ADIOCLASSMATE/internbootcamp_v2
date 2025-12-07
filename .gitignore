@@ -6,7 +6,7 @@ public
 __pycache__
 *.pyc
 .output
-
+test*
 *.log
 *.pid
 *.png
