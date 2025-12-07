@@ -5,6 +5,7 @@ data
 public
 __pycache__
 *.pyc
+.output
 
 *.log
 *.pid

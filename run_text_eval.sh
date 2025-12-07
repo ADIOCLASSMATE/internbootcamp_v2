@@ -29,8 +29,9 @@ export PORT=8000
 
 for MODEL in "${MODEL_LIST[@]}"; do
     export MODEL_PATH=${BASE_URL}/${MODEL}
-    export PORT=8000
-    # 从路径名称提取模型名称(DeepSeek-R1)
+    export API_URL="http://localhost:8000/v1"
+    export API_KEY="null"
+    # 从路径名称提取模型名称
     export MODEL_NAME=$(basename ${MODEL})
     echo "Evaluating Model: ${MODEL_NAME}"
 

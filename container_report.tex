@@ -1,0 +1,232 @@
+\documentclass[12pt, a4paper]{article}
+
+% 导入中文支持宏包 (建议使用 xelatex 编译)
+\usepackage{ctex}
+\setmainfont{Times New Roman}
+
+% 页面边距设置
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+
+% 图片和图形相关宏包
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{newunicodechar}
+\usepackage[most]{tcolorbox}
+
+% 定义特殊字符
+\newunicodechar{█}{\rule{1ex}{1ex}}
+
+% 定义颜色
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% 代码块设置
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{backcolour},
+    keywordstyle=\color{magenta},
+    commentstyle=\color{codegreen},
+    stringstyle=\color{codepurple},
+    numberstyle=\tiny\color{codegray},
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    captionpos=b
+}
+
+% 标题信息
+\title{\textbf{基于 Container With Most Water 任务的大语言模型多模态推理能力评测}}
+\author{蒋维 \quad 万佳欣 \quad 晁磊玉}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+本报告针对多模态推理中的 Container With Most Water（盛最多水的容器）任务进行了深入研究。该任务要求模型结合图像信息与文本指令，找出能容纳最多水的两条垂线。我们设计了优化的 Prompt Template 以规范模型输出，并采用了严格的 Binary Reward 机制进行评测。我们在 Qwen-2.5-VL 和 Qwen-3-VL 系列模型上进行了全面的评测，涵盖了从 7B 到 235B 等不同参数规模的模型。实验结果表明，随着模型参数量的增加，其在多模态推理任务上的表现呈现出显著的 Scaling Law 趋势，且我们的评测结果在部分设置下优于论文基准。
+\end{abstract}
+
+\section{任务描述与评测流程}
+
+\subsection{Container With Most Water 任务}
+Container With Most Water 任务源自经典的算法问题，但在多模态场景下，模型需要通过观察柱状图（Bar Chart）来识别各垂线的高度，并计算任意两条垂线与 x 轴构成的容器的最大容积。该任务考察了模型的 Visual Perception Capability（视觉感知能力）和 Logical Reasoning Capability（逻辑推理能力），要求模型不仅能准确读取图像数据，还能进行复杂的数学运算与比较。
+
+\begin{tcolorbox}[
+    colback=white,
+    colframe=gray!75!black,
+    title=\textbf{Container With Most Water},
+    fonttitle=\large\bfseries,
+    arc=3mm,
+    boxrule=1pt,
+    drop shadow
+]
+    \begin{minipage}[t]{0.45\textwidth}
+        \centering
+        \textbf{\large Image}
+        \vspace{0.2cm}
+        
+        \includegraphics[width=1.1\textwidth]{container/Success_Case.png}
+        
+        \vspace{0.5cm}
+        \raggedright
+        \textbf{Category:} Algorithm \\
+        \vspace{0.2cm}
+        \textbf{Difficulty:} Level 2
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.5\textwidth}
+        \textbf{\large Question}
+        \vspace{0.2cm}
+        
+        Given a row of vertical bars where consecutive bars are adjacent with no gaps between them.\\
+        Pick any two bars and form the sides of a water container, with the x-axis as the base.\\
+        How much water can the biggest possible container hold?
+        
+        \vspace{0.3cm}
+        Please analyze the image carefully and provide your answer.
+        
+        \vspace{0.3cm}
+        Output Format:\\
+        Provide your final answer as an integer enclosed in \texttt{\textbackslash boxed\{\}}
+        
+        \vspace{0.5cm}
+        \textbf{\large Reference Answer}
+        \vspace{0.2cm}
+        
+        512
+    \end{minipage}
+\end{tcolorbox}
+
+\subsection{Prompt Optimization}
+为了提高评测的稳定性，确保模型能够按照指定格式输出答案，我们设计了如下的 Prompt Template：
+
+\begin{tcolorbox}[colback=gray!5!white, colframe=gray!75!black, title=Prompt Template, fonttitle=\bfseries\sffamily, arc=1mm, boxrule=0.5pt, breakable]
+\begin{lstlisting}[basicstyle=\rmfamily\small, backgroundcolor={}, language={}, numbers=none, frame=none, breaklines=true, columns=fullflexible]
+Given a row of vertical bars where consecutive bars are adjacent with no gaps between them.
+Pick any two bars and form the sides of a water container, with the x-axis as the base.
+How much water can the biggest possible container hold?
+
+Please analyze the image carefully and provide your answer.
+
+Output Format:
+Provide your final answer as an integer enclosed in \boxed{{}}
+\end{lstlisting}
+\end{tcolorbox}
+
+该模板明确了任务目标、图像分析要求以及输出格式（$\backslash$boxed\{\{number\}\}），有助于后续的自动化评测与解析。
+
+\subsection{Reward Function}
+为了严谨地评估模型性能，我们采用了 Binary Reward 机制。仅当模型预测的答案与真实答案完全一致时，给予 0.9 分；否则给予 0.0 分。具体的 Reward Calculation 逻辑如下：
+
+$$ R_{answer} = \begin{cases} 0.9 & \text{if } y_{pred} = y_{true} \\ 0.0 & \text{if } y_{pred} \neq y_{true} \end{cases} $$
+
+此外，若模型输出符合格式要求，额外给予 0.1 分的 Format Reward。
+
+\section{实验结果与分析}
+
+我们对 Qwen-2.5-VL 系列（7B, 32B, 72B）和 Qwen-3-VL 系列（8B, 32B, 235B）模型进行了大规模评测。评测集包含 5 个难度等级（Level 1 至 Level 5），每个等级 100 个样本，共计 500 个样本。
+
+\subsection{Evaluation Results}
+所有模型的评测结果汇总于表 \ref{tab:model-comparison}。
+
+\begin{table}[htbp]
+    \centering
+    \caption{Qwen Series Models 在不同 Difficulty Levels 下的评测结果 (Score \%)}
+    \label{tab:model-comparison}
+    \input{container/model_comparison_table.tex}
+\end{table}
+
+\subsection{Performance Analysis}
+
+为了直观展示各模型的整体性能差异，我们绘制了 Overall Average Score 的对比图，如图 \ref{fig:overall-comparison} 所示。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{container/overall_comparison.png}
+    \caption{各模型在 Container With Most Water 任务上的整体平均得分对比}
+    \label{fig:overall-comparison}
+\end{figure}
+
+从图中可以看出，Qwen3-VL-235B 模型取得了最高的平均分数，展现了强大的多模态推理能力。
+
+进一步地，我们分析了模型在不同难度等级下的表现，如图 \ref{fig:difficulty-analysis} 所示。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{container/difficulty_analysis.png}
+    \caption{各模型在不同难度等级（Level 1 - Level 5）下的性能表现}
+    \label{fig:difficulty-analysis}
+\end{figure}
+
+结果显示，随着难度等级的提升（数据范围扩大、列表长度增加），大多数模型的性能呈现下降趋势，这符合预期。然而，大参数模型在复杂场景下依然保持了相对较高的准确率。
+
+\subsection{Scaling Law Analysis}
+
+我们重点关注了模型参数量与性能之间的关系。图 \ref{fig:scaling-law-qwen25} 展示了 Qwen-2.5-VL 系列模型的 Scaling Law 曲线，并与论文中的基准数据进行了对比。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{container/scaling_law_qwen25.png}
+    \caption{Qwen-2.5-VL 系列模型性能随参数量变化的趋势图（对比论文基准）}
+    \label{fig:scaling-law-qwen25}
+\end{figure}
+
+如图所示，我们的评测结果（Our Evaluation）与论文基准（Paper Benchmark）均显示出明显的 Scaling Law：随着参数量的增加，模型性能显著提升。值得注意的是，我们的评测结果在所有尺寸的模型上均优于论文基准，这可能得益于我们优化的 Prompt Template 引导模型更准确地进行推理。
+
+此外，图 \ref{fig:scaling-law-qwen3} 展示了 Qwen-3-VL 系列模型的 Scaling Law。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{container/scaling_law_qwen3.png}
+    \caption{Qwen-3-VL 系列模型性能随参数量变化的趋势图}
+    \label{fig:scaling-law-qwen3}
+\end{figure}
+
+Qwen-3-VL 系列同样遵循 Scaling Law，特别是 235B 模型实现了性能的飞跃。
+
+\section{Conclusion}
+本次实验通过构建 Container With Most Water 多模态评测任务，验证了 Qwen-VL 系列模型在视觉理解与逻辑推理方面的能力。实验结果表明，优化的 Prompt 能有效提升模型表现，而模型规模（Scaling）依然是提升复杂推理任务性能的关键因素。Qwen-3-VL-235B 的优异表现展示了大规模多模态模型在解决算法类视觉问题上的巨大潜力。
+
+\newpage
+\section{Model Output CoT Examples}
+
+为了直观展示模型的推理过程，我们选取了 Qwen-2.5-VL-72B-Instruct 的输出示例。
+
+\subsection{Qwen-2.5-VL-72B Output Example 1 (Success Case)}
+\begin{tcolorbox}[colback=gray!5!white, colframe=gray!75!black, title=Input Prompt, fonttitle=\bfseries\sffamily, arc=1mm, boxrule=0.5pt, breakable, lines before break=20]
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{container/Success_Case.png}
+\end{center}
+\lstinputlisting[basicstyle=\ttfamily\small, backgroundcolor={}, numbers=none, frame=none, breaklines=true]{container/qwen2.5_vl_72b_prompt_1.txt}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=gray!5!white, colframe=gray!75!black, title=Model Response, fonttitle=\bfseries\sffamily, arc=1mm, boxrule=0.5pt, breakable]
+\lstinputlisting[basicstyle=\ttfamily\small, backgroundcolor={}, numbers=none, frame=none, breaklines=true, columns=fullflexible]{container/qwen2.5_vl_72b_response_1.txt}
+\end{tcolorbox}
+
+\subsection{Qwen-2.5-VL-72B Output Example 2 (Failure Case)}
+\begin{tcolorbox}[colback=gray!5!white, colframe=gray!75!black, title=Input Prompt, fonttitle=\bfseries\sffamily, arc=1mm, boxrule=0.5pt, breakable, lines before break=20]
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{container/Failure_Case.png}
+\end{center}
+\lstinputlisting[basicstyle=\ttfamily\small, backgroundcolor={}, numbers=none, frame=none, breaklines=true]{container/qwen2.5_vl_72b_prompt_2.txt}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=gray!5!white, colframe=gray!75!black, title=Model Response, fonttitle=\bfseries\sffamily, arc=1mm, boxrule=0.5pt, breakable]
+\lstinputlisting[basicstyle=\ttfamily\small, backgroundcolor={}, numbers=none, frame=none, breaklines=true, columns=fullflexible]{container/qwen2.5_vl_72b_response_2.txt}
+\end{tcolorbox}
+
+\end{document}

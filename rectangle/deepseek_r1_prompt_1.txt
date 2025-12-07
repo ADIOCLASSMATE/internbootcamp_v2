@@ -1,0 +1,45 @@
+Your task is to count how many rectangles are present in an ASCII grid.
+
+Single rectangles are outlined with a '#', overlapping rectangles (max 2) are shown with '█'.
+
+Your output should be a single number, representing the total count of rectangles, and put it in the format \boxed{number}.
+
+Now, it's your turn. How many rectangles do you see in the grid below?
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                   ################     
+                   #              #     
+                   #              #     
+                   #              #     
+                   #              #     
+                   #              #     
+                   #              #     
+                   #              #     
+                   #              #     
+                   #              #     
+                   #              #     
+                   #              #     
+                   #              #     
+                   #              #     
+                   #              #     
+                   #              #     
+                   ################     
+                                        
+                                        
+                                        
+                  ###########           
+                  #         #           
+                  ###########

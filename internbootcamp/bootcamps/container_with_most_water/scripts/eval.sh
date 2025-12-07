@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # 容器盛水问题评测脚本
-PORT=${PORT:-8000}
-MODEL_NAME=${MODEL_NAME:-"deepseek-ai/DeepSeek-V3"}
+# 使用从主脚本 export 的环境变量
+API_URL=${API_URL:-"http://localhost:8000/v1"}
+MODEL_NAME=${MODEL_NAME:-"unknown"}
+API_KEY=${API_KEY:-"null"}
 
 # 查找数据集 - 支持多种命名模式
 DATASET=$(find data/container_with_most_water -maxdepth 1 -name "train*.jsonl" -o -name "*train.jsonl" | sort | tail -n 1)
@@ -16,8 +18,8 @@ if [ -n "$DATASET" ]; then
     python -m internbootcamp.utils.run_evaluation \
       --dataset-path "$DATASET" \
       --output-dir outputs/ \
-      --api-key "null" \
-      --api-url "http://localhost:${PORT}/v1" \
+      --api-key "${API_KEY}" \
+      --api-url "${API_URL}" \
       --api-model ${MODEL_NAME} \
       --reward-calculator-class "internbootcamp.bootcamps.container_with_most_water.reward_calculator.ContainerWithMostWaterRewardCalculator" \
       --max-concurrent 32 \

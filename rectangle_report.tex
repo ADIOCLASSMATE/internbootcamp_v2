@@ -1,0 +1,192 @@
+\documentclass[12pt, a4paper]{article}
+
+% 导入中文支持宏包 (建议使用 xelatex 编译)
+\usepackage{ctex}
+\setmainfont{Times New Roman}
+
+% 页面边距设置
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+
+% 图片和图形相关宏包
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{newunicodechar}
+\usepackage[most]{tcolorbox}
+
+% 定义特殊字符
+\newunicodechar{█}{\rule{1ex}{1ex}}
+
+% 定义颜色
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% 代码块设置
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{backcolour},
+    keywordstyle=\color{magenta},
+    commentstyle=\color{codegreen},
+    stringstyle=\color{codepurple},
+    numberstyle=\tiny\color{codegray},
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    captionpos=b
+}
+
+% 标题信息
+\title{\textbf{基于 Rectangle Count 任务的大语言模型文本推理能力评测}}
+\author{蒋维 \quad 万佳欣 \quad 晁磊玉}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+本报告针对纯文本推理中的 Rectangle Count（矩形计数）任务进行了深入研究。我们首先分析了任务特性，并设计了优化的 Prompt Template 以规范模型输出。随后，我们在 DeepSeek-R1 模型上进行了 Ablation Study，探究了 Grid Size 对模型性能的影响，并根据 Error Analysis 调整了 Reward Function，从 Linear Decay 改为更严格的 Binary Reward，以避免模型通过猜测获得高分。最后，我们在 Qwen-2.5 和 Qwen-3 系列模型上进行了全面的评测，采用了论文中的 Easy and Hard Difficulty Levels，验证了模型规模与性能之间的 Scaling Law。
+\end{abstract}
+
+\section{任务描述与评测流程}
+
+\subsection{Rectangle Count 任务}
+Rectangle Count 任务要求模型识别并计数 ASCII 网格中的矩形数量。单个矩形由 `\#` 字符勾勒，重叠矩形（最多 2 个）由 `█` 字符表示。该任务考察了模型的 Logical Reasoning Capability 和对复杂图形结构的理解能力。
+
+\subsection{Prompt Optimization}
+为了提高评测的稳定性，确保模型能够按照指定格式输出答案，我们设计了如下的 Prompt Template：
+
+\begin{tcolorbox}[colback=gray!5!white, colframe=gray!75!black, title=Prompt Template, fonttitle=\bfseries\sffamily, arc=1mm, boxrule=0.5pt, breakable]
+\begin{lstlisting}[basicstyle=\rmfamily\small, backgroundcolor={}, language={}, numbers=none, frame=none, breaklines=true, columns=fullflexible]
+Your task is to count how many rectangles are present in an ASCII grid.
+
+Single rectangles are outlined with a '#', overlapping rectangles (max 2) are shown with '█'.
+
+Your output should be a single number, representing the total count of rectangles, and put it in the format \\boxed{{number}}.
+
+Now, it's your turn. How many rectangles do you see in the grid below?
+{puzzle}
+\end{lstlisting}
+\end{tcolorbox}
+
+该模板明确了任务目标、符号含义以及输出格式（$\backslash$boxed\{\{number\}\}），有助于后续的自动化评测与解析。
+
+\section{实验一：DeepSeek-R1 Ablation Study 与 Error Analysis}
+
+鉴于 reasoning-gym 论文详细报告了 DeepSeek-R1 模型在 Rectangle Count 任务上的性能表现——在标准的 $80 \times 80$ 网格设置下，其 Easy Setting 得分为 46.0，Hard Setting 得分为 16.0——我们选取该模型作为前期验证实验的 Base Model。这不仅有助于我们将复现结果与论文基准进行对齐，也为后续的 Ablation Study 和评测流程优化提供了可靠的参照系。
+
+\begin{table}[htbp]
+    \centering
+    \caption{论文中 DeepSeek-R1 在 80$\times$80 网格下的基准性能}
+    \label{tab:deepseek-baseline}
+    \begin{tabular}{llc}
+    \toprule
+    \textbf{Grid Size} & \textbf{Difficulty} & \textbf{Score} \\
+    \midrule
+    80$\times$80 & Easy & 0.46 \\
+                 & Hard & 0.16 \\
+    \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{实验假设与设置}
+我们假设在矩形数量相同的情况下，输入数据的 Grid Size 越大，矩形重叠的概率越低，任务相对越简单。为了验证这一假设，我们在 DeepSeek-R1 模型上进行了 Ablation Study，设置了不同的 Grid Size 配置，各配置生成100个测试样本，并记录模型的表现。
+
+\subsection{实验结果}
+实验结果如表 \ref{tab:deepseek-ablation} 所示。
+
+\begin{table}[H]
+    \centering
+    \caption{DeepSeek-R1 模型在不同 Grid Size 下的 Ablation Study 结果}
+    \label{tab:deepseek-ablation}
+    \input{rectangle/ablation_table.tex}
+\end{table}
+
+结果显示，随着 Grid Size 的增加，模型的 Accuracy 呈现上升趋势，验证了我们的假设。较大的画布减少了图形的密集重叠，降低了解析的难度。我们的 Prompt 在相同的 Setting 下，帮助模型超过了论文中的基准分数。
+
+\subsection{Error Analysis 与 Reward Function Adjustment}
+在分析 DeepSeek-R1 的 Ablation Study 输出时，我们发现模型有时会产生类似如下的错误推理：
+
+\begin{quote}
+In ASCII art, if two rectangles intersect... However, these are line segments, not rectangles.
+So it's probably not.
+Given the difficulty, I'll assume the answer is 8.
+I output \boxed{8}.
+\end{quote}
+
+在这种情况下，模型在不确定的情况下进行猜测。我们最初参考相关论文使用的 Reward Function 为 Linear Decay：
+$$ R_{answer} = \begin{cases} 0.9 & \text{if } |y_{pred} - y_{true}| = 0 \\ 0.9 \times (1 - \frac{|y_{pred} - y_{true}|}{5}) & \text{if } 0 < |y_{pred} - y_{true}| < 5 \\ 0 & \text{if } |y_{pred} - y_{true}| \ge 5 \end{cases} $$
+
+由于 Linear Decay 机制，猜测接近的答案也能获得较高的 Reward，这不能真实反映模型的 Reasoning Capability。因此，为了更严谨地评估模型性能，我们将 Answer Reward 修改为固定的 Binary Reward：
+$$ R_{answer} = \begin{cases} 0.9 & \text{if } y_{pred} = y_{true} \\ 0.1 & \text{if } y_{pred} \neq y_{true} \end{cases} $$
+答对得 0.9 分，答错得 0.1 分。
+此外，若模型输出符合格式要求，额外给予 0.1 分的 Format Reward。
+
+\section{实验二：DeepSeek 与 Qwen Series Models Evaluation}
+
+在完成 Ablation Study 与 Error Analysis 后，我们正式对 DeepSeek 系列（DeepSeek-R1, DeepSeek-V3）与 Qwen 系列（Qwen2.5, Qwen3, QwQ）模型进行了大规模评测。在此阶段，我们采用了更严格的 Answer Reward Calculation：仅当预测答案与真实答案完全一致时得 0.9 分，否则得 0.1 分。这一调整旨在消除模型猜测带来的分数偏差，更真实地反映模型的精确 Reasoning Capability。
+
+\subsection{Evaluation Results}
+所有模型的评测结果汇总于表 \ref{tab:model-comparison}。
+
+\begin{table}[htbp]
+    \centering
+    \input{rectangle/model_comparison_table.tex}
+    \caption{DeepSeek 与 Qwen Series Models 在不同 Difficulty Levels 下的评测结果}
+    \label{tab:model-comparison}
+\end{table}
+
+为了直观展示模型规模对性能的影响，我们展示 Qwen2.5 与 Qwen3 系列模型的评测结果折线图，如图 \ref{fig:qwen2.5-charts} 和图 \ref{fig:qwen3-charts} 所示。
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{rectangle/qwen2.5_performance_comparison.png}
+    \caption{Qwen2.5 Series Models 在 Easy 和 Hard Setting 下的性能随参数量变化的趋势图}
+    \label{fig:qwen2.5-charts}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{rectangle/qwen3_performance_comparison.png}
+    \caption{Qwen3 Series Models 在 Easy 和 Hard Setting 下的性能随参数量变化的趋势图}
+    \label{fig:qwen3-charts}
+\end{figure}
+
+从结果可以看出，DeepSeek-R1 在 Easy 和 Hard Setting 下均表现出色，但是由于采用了更加严格的answer reward计算方式，分数较论文中的指标有所下降。Qwen Series Models 整体呈现出 Scaling Law 的趋势，即随着参数量的增加，模型性能显著提升。特别是 Qwen3-235B-A22B-Instruct-2507 模型，在 Easy Setting 下取得了最高的 0.4850 分。
+\section{Conclusion}
+本次实验通过优化 Prompt 和 Reward Function，建立了一套更严谨的 Rectangle Count 任务评测流程。DeepSeek-R1 的 Ablation Study 揭示了输入数据的 Grid Size 对推理的影响，同时证明了我们优化后的prompt会获得比原论文中更高的分数。Qwen Series Models 的评测则验证了模型规模对任务性能的显著贡献。
+
+\section{Model Output CoT Examples}
+
+为了直观展示模型的推理过程，我们选取了 DeepSeek-R1 分别在 Easy Difficulty 与 Hard Difficulty 的输出示例。
+
+\subsection{DeepSeek-R1 Output Example 1 (Easy Setting)}
+\begin{tcolorbox}[colback=gray!5!white, colframe=gray!75!black, title=Input Prompt, fonttitle=\bfseries\sffamily, arc=1mm, boxrule=0.5pt, breakable]
+\lstinputlisting[basicstyle=\ttfamily\small, backgroundcolor={}, numbers=none, frame=none, breaklines=true]{rectangle/deepseek_r1_prompt_1.txt}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=gray!5!white, colframe=gray!75!black, title=Model Response, fonttitle=\bfseries\sffamily, arc=1mm, boxrule=0.5pt, breakable]
+\lstinputlisting[basicstyle=\ttfamily\small, backgroundcolor={}, numbers=none, frame=none, breaklines=true, columns=fullflexible]{rectangle/deepseek_r1_response_1.txt}
+\end{tcolorbox}
+
+\subsection{DeepSeek-R1 Output Example 2 (Hard Setting)}
+\begin{tcolorbox}[colback=gray!5!white, colframe=gray!75!black, title=Input Prompt, fonttitle=\bfseries\sffamily, arc=1mm, boxrule=0.5pt, breakable]
+\lstinputlisting[basicstyle=\ttfamily\small, backgroundcolor={}, numbers=none, frame=none, breaklines=true]{rectangle/deepseek_r1_prompt_2.txt}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=gray!5!white, colframe=gray!75!black, title=Model Response, fonttitle=\bfseries\sffamily, arc=1mm, boxrule=0.5pt, breakable]
+\lstinputlisting[basicstyle=\ttfamily\small, backgroundcolor={}, numbers=none, frame=none, breaklines=true, columns=fullflexible]{rectangle/deepseek_r1_response_2.txt}
+\end{tcolorbox}
+
+\end{document}

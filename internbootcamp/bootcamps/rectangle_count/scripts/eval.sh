@@ -1,3 +1,11 @@
+#!/bin/bash
+
+# 矩形计数问题评测脚本
+# 使用从主脚本 export 的环境变量
+API_URL=${API_URL:-"http://localhost:8000/v1"}
+MODEL_NAME=${MODEL_NAME:-"unknown"}
+API_KEY=${API_KEY:-"null"}
+
 # 查找 easy 与 hard 数据集
 EASY_DATASET=$(find data/rectangle_count -maxdepth 1 -name "*easy*train*.jsonl" -o -name "*train*easy*.jsonl" | sort | tail -n 1)
 
@@ -18,8 +26,8 @@ if [ -n "$EASY_DATASET" ]; then
     python -m internbootcamp.utils.run_evaluation \
       --dataset-path "$EASY_DATASET" \
       --output-dir outputs/ \
-      --api-key "null" \
-      --api-url "http://localhost:${PORT}/v1" \
+      --api-key "${API_KEY}" \
+      --api-url "${API_URL}" \
       --api-model ${MODEL_NAME} \
       --reward-calculator-class "internbootcamp.bootcamps.rectangle_count.reward_calculator.RectangleCountRewardCalculator" \
       --max-concurrent 32 \
@@ -40,8 +48,8 @@ if [ -n "$HARD_DATASET" ]; then
     python -m internbootcamp.utils.run_evaluation \
       --dataset-path "$HARD_DATASET" \
       --output-dir outputs/ \
-      --api-key "null" \
-      --api-url "http://localhost:${PORT}/v1" \
+      --api-key "${API_KEY}" \
+      --api-url "${API_URL}" \
       --api-model ${MODEL_NAME} \
       --reward-calculator-class "internbootcamp.bootcamps.rectangle_count.reward_calculator.RectangleCountRewardCalculator" \
       --max-concurrent 32 \
